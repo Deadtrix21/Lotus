@@ -1,0 +1,1 @@
+from dependency_injector.wiring import inject, Provide

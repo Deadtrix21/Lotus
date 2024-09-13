@@ -1,0 +1,40 @@
+autoLoad:
+     extensions: "bot/extensions/"
+     listeners: "bot/listeners/"
+     tasks: "bot/tasks/"
+environment:
+     name: "development"
+     development:
+          token: "${DISCORD_TOKEN_DEV}"
+          applicationVersionName: "DEVELOPMENT LOTUS"
+          container:
+               prefix: [ "u!", "U!" ]
+               database:
+                    sqlServerUrl: "${SQL_SERVER_URL_DEV}"
+                    mongoDbUrl: "${MONGO_DB_URL_DEV}"
+               lavalink:
+                    host: "${LAVALINK_HOST_DEV}"
+                    port: ${LAVALINK_PORT_DEV}
+                    password: "${LAVALINK_PASSWORD_DEV}"
+                    ssl: ${LAVALINK_SSL_DEV}
+                    heartbeat: ${LAVALINK_HEARTBEAT_DEV}
+                    spotify:
+                         clientId: "${SPOTIFY_CLIENT_ID_DEV}"
+                         clientSecret: "${SPOTIFY_CLIENT_SECRET_DEV}"
+     production:
+          token: "${DISCORD_TOKEN_PROD}"
+          applicationVersionName: "PRODUCTION LOTUS"
+          container:
+               prefix: [ "l!", "L!" ]
+               database:
+                    sqlServerUrl: "${SQL_SERVER_URL_PROD}"
+                    mongoDbUrl: "${MONGO_DB_URL_PROD}"
+               lavalink:
+                    host: "${LAVALINK_HOST_PROD}"
+                    port: ${LAVALINK_PORT_PROD}
+                    password: "${LAVALINK_PASSWORD_PROD}"
+                    ssl: ${LAVALINK_SSL_PROD}
+                    heartbeat: ${LAVALINK_HEARTBEAT_PROD}
+                    spotify:
+                         clientId: "${SPOTIFY_CLIENT_ID_PROD}"
+                         clientSecret: "${SPOTIFY_CLIENT_SECRET_PROD}"
