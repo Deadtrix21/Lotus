@@ -1,0 +1,1 @@
+from .ban_class.ban import Main as ban

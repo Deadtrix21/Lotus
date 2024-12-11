@@ -1,0 +1,1 @@
+from .tts_class.TTS import TTS, __data__

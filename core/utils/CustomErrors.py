@@ -1,0 +1,4 @@
+
+
+class ExtentionError(BaseException):
+    pass
