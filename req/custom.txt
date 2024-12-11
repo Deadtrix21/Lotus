@@ -1,0 +1,14 @@
+gtts
+h5py
+arrow
+PyNaCl
+pyyaml
+Pillow
+waifu-py
+selenium
+asyncinit
+pymongo[srv]
+humanfriendly
+python-dotenv
+webdriver_manager
+marshmallow-dataclass[enum,union]

@@ -1,0 +1,148 @@
+from discord.ext import commands
+from .classes.Admin import Purge
+import humanfriendly
+import typing
+import discord
+import datetime
+
+
+class Admin(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+    
+    
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_guild_permissions(kick_members=True)
+    @commands.bot_has_permissions(kick_members=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def kick(self, ctx, member:discord.Member, *, reason=None):
+        """
+        Kicks a member from the server. Reason is required.
+        """
+        if not reason:
+            reason = "No reason provided."
+
+        await member.kick(reason=reason)
+        await ctx.send(f'Kicked `{member}`')
+
+
+    @commands.command(aliases=['b'])
+    @commands.has_guild_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def ban(self, ctx, member:typing.Union[discord.Member,int], *, reason):
+        """
+        Bans a member from the server. Reason is required
+        You can also ban someone that is not in the server using their user ID.
+        """
+        if reason:
+            if isinstance(member, int):
+                await ctx.guild.ban(discord.Object(id=member), reason=f"{reason}")
+                user = await self.bot.fetch_user(member)
+                await ctx.send(f'Banned `{user}`')
+            else:
+                await member.ban(reason=f"{reason}", delete_message_days=0)
+                await ctx.send(f'Banned `{member}`')
+        else:
+            await ctx.send(f"Provide a reason to ban this user.")
+
+    @commands.command(aliases=['mb'])
+    @commands.guild_only()
+    @commands.has_guild_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def massban(self, ctx, members:commands.Greedy[discord.Member], *, reason):
+        """
+        Mass bans multiple members from the server. Reason is required.
+        You can only ban users who are in the server.
+        """
+        if not len(members):
+            await ctx.send('One or more required arguments are missing.')
+
+        else:
+            for target in members:
+                await target.ban(reason=reason, delete_message_days=0)
+                await ctx.send(f'Banned `{target}`')
+
+    
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_permissions(ban_members=True)
+    async def unban(self, ctx, member):
+        try:
+            member : discord.User = await self.bot.fetch_user(member)
+            try:
+                await ctx.guild.unban(member)
+                await ctx.send(f"{member.name} has been unbanned.")
+            except Exception as EE:
+                print(EE)
+                await ctx.send("This user  was never banned or on this server")
+        except Exception as E:
+            print(E)
+            await ctx.send("User Does Not Exist")
+     
+   
+    
+    @commands.command()
+    @commands.guild_only()
+    async def invite(self, ctx):
+        await ctx.send(await discord.abc.GuildChannel.create_invite(ctx.message.channel))
+    
+    
+    @commands.command(aliases=['mute'])
+    @commands.guild_only()
+    @commands.has_guild_permissions(moderate_members=True)
+    @commands.bot_has_permissions(moderate_members=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def timeout(self, ctx, member: discord.Member, time, *, reason=None):
+        """
+        Mute's a member for specific time.
+        Use 5m for 5 mins, 1hr for 1 hour etc...
+        """
+        if reason is None:
+            reason = 'No reason provided'
+        time = humanfriendly.parse_timespan(time)
+        await member.timeout(until=discord.utils.utcnow() + datetime.timedelta(seconds=time), reason=reason)
+        await ctx.send(f"{member} has been muted for {time}.\nReason: {reason}")
+
+    @commands.command()
+    @commands.guild_only()
+    @commands.has_guild_permissions(moderate_members=True)
+    @commands.bot_has_permissions(moderate_members=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def unmute(self, ctx, member: discord.Member, *, reason=None):
+        """
+        Unmutes a member.
+        """
+        if reason is None:
+            reason = 'No reason provided'
+        await member.remove_timeout(reason=reason)
+        await ctx.send(f"{member} has been unmuted!")
+    
+    
+    @commands.group()
+    @commands.has_guild_permissions(manage_messages=True)
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge(self, ctx):
+        if ctx.invoked_subcommand is None:
+            _ = [self.bot, ctx, "nn", 10]
+            await Purge.Purge(*_)    
+    
+    @purge.command(name="normal", aliases=["n"])
+    async def channel_p_n(self, ctx, x:int = None):
+       _ = [self.bot, ctx, "n", x ]
+       await Purge.Purge(*_)
+    
+            
+    @purge.command(name="channel", aliases=["c"])
+    async def channel_p_c(self, ctx, x:int = None):
+       _ = [self.bot, ctx, "c", x ]
+       await Purge.Purge(*_)
+    
+    
+    
+def setup(bot):
+    c = Admin(bot)
+    bot.add_cog(c)
